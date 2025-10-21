@@ -1,0 +1,45 @@
+# FastAPI and ASGI server
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Authentication and security
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Data validation
+pydantic
+pydantic[email]
+pydantic-settings
+
+# Environment and configuration
+python-dotenv
+
+# HTTP client
+httpx
+
+# File handling
+aiofiles
+
+# Logging
+structlog
+
+# Development and testing
+pytest
+pytest-asyncio
+pytest-cov
+
+# Code quality
+black
+isort
+flake8
+
+# Type checking
+mypy 
+
+passlib
+bcrypt==3.2.2
