@@ -31,3 +31,26 @@ class AuthService:
         user = await self.user_repo.create(user_dict)
         return user
 
+    async def login(self, credentials: UserLogin):
+        user = await self.user_repo.get_by_email(credentials.email)
+        if not user or not verify_password(credentials.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password"
+            )
+
+        # Create tokens
+        token_data = {
+            "user_id": user.id,
+            "email": user.email,
+            "role": user.role
+        }
+        
+        access_token = create_access_token(token_data)
+        refresh_token = create_refresh_token(token_data)
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "refresh_token": refresh_token
+        }
