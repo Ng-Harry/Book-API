@@ -5,21 +5,23 @@ from typing import Optional
 
 from app.database import get_db
 from app.auth.dependencies import get_current_active_user, require_admin
-from app.schemas.booking import BookingResponse, BookingCreate, BookingUpdate
+from app.schemas.booking import BookingResponse, BookingWithServiceResponse, BookingCreate, BookingUpdate
 from app.services.booking import BookingService
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
-@router.post("/", response_model=BookingResponse, status_code=201)
+@router.post("/", response_model=BookingWithServiceResponse, status_code=201)
 async def create_booking(
     booking_data: BookingCreate,
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_active_user)
 ):
     booking_service = BookingService(db)
-    return await booking_service.create_booking(current_user.id, booking_data)
+    booking = await booking_service.create_booking(current_user.id, booking_data)
+    # Return booking with service details
+    return await booking_service.get_booking_with_service(booking.id)
 
-@router.get("/", response_model=list[BookingResponse])
+@router.get("/", response_model=list[BookingWithServiceResponse])
 async def get_bookings(
     status: Optional[str] = Query(None),
     from_date: Optional[datetime] = Query(None),
@@ -34,25 +36,25 @@ async def get_bookings(
     else:
         return await booking_service.get_user_bookings(current_user.id)
 
-@router.get("/{booking_id}", response_model=BookingResponse)
+@router.get("/{booking_id}", response_model=BookingWithServiceResponse)
 async def get_booking(
     booking_id: int,
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_active_user)
 ):
     booking_service = BookingService(db)
-    booking = await booking_service.get_booking(booking_id)
+    booking_with_service = await booking_service.get_booking_with_service(booking_id)
     
     # Check permissions
-    if current_user.role != "admin" and booking.user_id != current_user.id:
+    if current_user.role != "admin" and booking_with_service.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to view this booking"
         )
     
-    return booking
+    return booking_with_service
 
-@router.patch("/{booking_id}", response_model=BookingResponse)
+@router.patch("/{booking_id}", response_model=BookingWithServiceResponse)
 async def update_booking(
     booking_id: int,
     booking_update: BookingUpdate,
@@ -60,7 +62,8 @@ async def update_booking(
     current_user = Depends(get_current_active_user)
 ):
     booking_service = BookingService(db)
-    return await booking_service.update_booking(booking_id, booking_update, current_user)
+    updated_booking = await booking_service.update_booking(booking_id, booking_update, current_user)
+    return await booking_service.get_booking_with_service(booking_id)
 
 @router.delete("/{booking_id}")
 async def delete_booking(
