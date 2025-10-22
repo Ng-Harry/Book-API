@@ -35,7 +35,7 @@ app.include_router(reviews.router, prefix=settings.API_PREFIX)
 @app.on_event("startup")
 async def startup_event():
     logger.info("Starting up BookIt API...")
-    await init_db()  # This creates all tables
+    await init_db()
 
 @app.on_event("shutdown")
 async def shutdown_event():
