@@ -10,17 +10,38 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserRegister, db: AsyncSession = Depends(get_db)):
+
     auth_service = AuthService(db)
-    user = await auth_service.register(user_data)
-    return await auth_service.login(UserLogin(email=user_data.email, password=user_data.password))
+    try:
+        user = await auth_service.register(user_data)
+        # Auto-login after registration
+        return await auth_service.login(UserLogin(
+            email=user_data.email, 
+            password=user_data.password
+        ))
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed due to server error"
+        )
 
 @router.post("/login", response_model=Token)
 async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db)):
+    """
+    Authenticate user and return JWT tokens.
+    """
     auth_service = AuthService(db)
     return await auth_service.login(credentials)
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(refresh_data: RefreshToken, db: AsyncSession = Depends(get_db)):
+    """
+    Refresh access token using refresh token.
+    """
     token_data = verify_token(refresh_data.refresh_token)
     if token_data is None:
         raise HTTPException(
@@ -43,5 +64,8 @@ async def refresh_token(refresh_data: RefreshToken, db: AsyncSession = Depends(g
 
 @router.post("/logout")
 async def logout(response: Response):
+    """
+    Logout user (client should discard tokens).
+    """
     response.delete_cookie("access_token")
     return {"message": "Successfully logged out"}
