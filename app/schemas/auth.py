@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from app.models.user import UserRole
 
 class Token(BaseModel):
@@ -16,10 +16,10 @@ class RefreshToken(BaseModel):
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=6, description="Password cannot be empty")
 
 class UserRegister(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=100, description="Name must be between 1-100 characters")
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=6, max_length=72, description="Password must be 6-72 characters")
     role: UserRole = UserRole.USER

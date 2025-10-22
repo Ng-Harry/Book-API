@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     ENV: str = "development"  # "production" or "development"
 
     # Local & Production Databases
-    DATABASE_URL_DEV: str = "postgresql+asyncpg://postgres:password@localhost:5432/bookit"
+    DATABASE_URL_DEV: str = "postgresql://postgres:ngharry00@db.qvucveskwcpcssrinszg.supabase.co:5432/postgres"
     DATABASE_URL_PROD: str = "postgresql://postgres:jnmkl,hghfdfghjs"
 
     # JWT
