@@ -19,7 +19,3 @@ class ReviewResponse(ReviewBase):
 
     class Config:
         from_attributes = True
-
-class ReviewWithDetails(ReviewResponse):
-    user_name: str
-    service_title: str
