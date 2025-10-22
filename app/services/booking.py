@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.booking import BookingRepository
 from app.repositories.service import ServiceRepository
-from app.schemas.booking import BookingCreate, BookingUpdate
+from app.schemas.booking import BookingCreate, BookingUpdate, BookingWithServiceResponse
 from app.models.booking import BookingStatus
 
 class BookingService:
@@ -52,11 +52,70 @@ class BookingService:
             )
         return booking
 
+    async def get_booking_with_service(self, booking_id: int):
+        """Get booking with service details"""
+        result = await self.booking_repo.get_booking_with_service(booking_id)
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found"
+            )
+        
+        booking, service = result
+        return BookingWithServiceResponse(
+            id=booking.id,
+            user_id=booking.user_id,
+            service_id=booking.service_id,
+            start_time=booking.start_time,
+            end_time=booking.end_time,
+            status=booking.status,
+            created_at=booking.created_at,
+            service_title=service.title,
+            service_price=service.price,
+            service_duration=service.duration_minutes
+        )
+
     async def get_user_bookings(self, user_id: int):
-        return await self.booking_repo.get_user_bookings(user_id)
+        """Get user bookings with service details"""
+        results = await self.booking_repo.get_user_bookings_with_services(user_id)
+        bookings_with_services = []
+        
+        for booking, service in results:
+            bookings_with_services.append(BookingWithServiceResponse(
+                id=booking.id,
+                user_id=booking.user_id,
+                service_id=booking.service_id,
+                start_time=booking.start_time,
+                end_time=booking.end_time,
+                status=booking.status,
+                created_at=booking.created_at,
+                service_title=service.title,
+                service_price=service.price,
+                service_duration=service.duration_minutes
+            ))
+        
+        return bookings_with_services
 
     async def get_all_bookings_with_filters(self, status: str = None, from_date: str = None, to_date: str = None):
-        return await self.booking_repo.get_bookings_with_filters(status, from_date, to_date)
+        """Get all bookings with service details (for admin)"""
+        results = await self.booking_repo.get_all_bookings_with_services(status, from_date, to_date)
+        bookings_with_services = []
+        
+        for booking, service in results:
+            bookings_with_services.append(BookingWithServiceResponse(
+                id=booking.id,
+                user_id=booking.user_id,
+                service_id=booking.service_id,
+                start_time=booking.start_time,
+                end_time=booking.end_time,
+                status=booking.status,
+                created_at=booking.created_at,
+                service_title=service.title,
+                service_price=service.price,
+                service_duration=service.duration_minutes
+            ))
+        
+        return bookings_with_services
 
     async def update_booking(self, booking_id: int, booking_update: BookingUpdate, current_user):
         booking = await self.get_booking(booking_id)

@@ -3,6 +3,7 @@ from sqlalchemy.future import select
 from sqlalchemy import and_, or_
 from datetime import datetime
 from app.models.booking import Booking
+from app.models.service import Service
 from app.schemas.booking import BookingCreate, BookingUpdate
 from app.repositories.base import BaseRepository
 
@@ -30,6 +31,42 @@ class BookingRepository(BaseRepository[Booking, BookingCreate, BookingUpdate]):
         
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def get_booking_with_service(self, booking_id: int):
+        """Get booking with service details"""
+        result = await self.db.execute(
+            select(Booking, Service)
+            .join(Service, Booking.service_id == Service.id)
+            .where(Booking.id == booking_id)
+        )
+        return result.first()
+
+    async def get_user_bookings_with_services(self, user_id: int, skip: int = 0, limit: int = 100):
+        """Get user bookings with service details"""
+        result = await self.db.execute(
+            select(Booking, Service)
+            .join(Service, Booking.service_id == Service.id)
+            .where(Booking.user_id == user_id)
+            .offset(skip)
+            .limit(limit)
+        )
+        return result.all()
+
+    async def get_all_bookings_with_services(self, status: str = None, from_date: datetime = None, to_date: datetime = None):
+        """Get all bookings with service details (for admin)"""
+        stmt = select(Booking, Service).join(Service, Booking.service_id == Service.id)
+        
+        if status:
+            stmt = stmt.where(Booking.status == status)
+        
+        if from_date:
+            stmt = stmt.where(Booking.start_time >= from_date)
+        
+        if to_date:
+            stmt = stmt.where(Booking.start_time <= to_date)
+        
+        result = await self.db.execute(stmt)
+        return result.all()
 
     async def check_booking_conflict(self, service_id: int, start_time: datetime, end_time: datetime, exclude_booking_id: int = None):
         stmt = select(Booking).where(
