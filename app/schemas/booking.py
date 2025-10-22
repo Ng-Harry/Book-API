@@ -24,7 +24,3 @@ class BookingResponse(BaseModel):
 
     class Config:
         from_attributes = True
-
-class BookingWithDetails(BookingResponse):
-    user_name: str
-    service_title: str
