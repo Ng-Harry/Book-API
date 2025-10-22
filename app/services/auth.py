@@ -23,10 +23,13 @@ class AuthService:
         # Hash password
         hashed_password = get_password_hash(user_data.password)
         
-        # Create user
-        user_dict = user_data.dict()
-        user_dict["password_hash"] = hashed_password
-        del user_dict["password"]
+        # Create user data as dictionary including role
+        user_dict = {
+            "name": user_data.name,
+            "email": user_data.email,
+            "password_hash": hashed_password,
+            "role": user_data.role.value  # Convert enum to string value
+        }
         
         user = await self.user_repo.create(user_dict)
         return user

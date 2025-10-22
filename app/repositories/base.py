@@ -21,7 +21,14 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalars().all()
 
     async def create(self, obj_in: CreateSchemaType) -> ModelType:
-        db_obj = self.model(**obj_in.dict())
+        # FIX: Check if it's a dict or Pydantic model
+        if hasattr(obj_in, 'dict'):
+            # It's a Pydantic model
+            db_obj = self.model(**obj_in.dict())
+        else:
+            # It's already a dictionary
+            db_obj = self.model(**obj_in)
+            
         self.db.add(db_obj)
         await self.db.commit()
         await self.db.refresh(db_obj)
@@ -30,7 +37,12 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def update(self, id: int, obj_in: UpdateSchemaType) -> Optional[ModelType]:
         db_obj = await self.get_by_id(id)
         if db_obj:
-            update_data = obj_in.dict(exclude_unset=True)
+            # FIX: Handle both dict and Pydantic model
+            if hasattr(obj_in, 'dict'):
+                update_data = obj_in.dict(exclude_unset=True)
+            else:
+                update_data = obj_in
+                
             for field, value in update_data.items():
                 setattr(db_obj, field, value)
             await self.db.commit()

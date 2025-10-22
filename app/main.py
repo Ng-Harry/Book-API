@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.config import settings
+from app.database import init_db
 from app.routers import auth, users, services, bookings, reviews
 
 # Configure logging
@@ -34,6 +35,7 @@ app.include_router(reviews.router, prefix=settings.API_PREFIX)
 @app.on_event("startup")
 async def startup_event():
     logger.info("Starting up BookIt API...")
+    await init_db()  # This creates all tables
 
 @app.on_event("shutdown")
 async def shutdown_event():
