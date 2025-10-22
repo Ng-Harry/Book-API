@@ -24,3 +24,18 @@ class BookingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class BookingWithServiceResponse(BaseModel):
+    id: int
+    user_id: int
+    service_id: int
+    start_time: datetime
+    end_time: datetime
+    status: BookingStatus
+    created_at: datetime
+    service_title: str
+    service_price: float
+    service_duration: int
+
+    class Config:
+        from_attributes = True
