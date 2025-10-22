@@ -72,17 +72,17 @@ venv\Scripts\activate     # activate env for Windows
 
 | Variable | Description | Example |
 |-----------|--------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://user:pass@host:port/dbname` |
-| `JWT_SECRET_KEY` | Secret key for signing JWT tokens | `supersecretkey` |
-| `JWT_REFRESH_SECRET_KEY` | Secret key for refresh tokens | `anothersecretkey` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT expiry time in minutes | `30` |
-| `REFRESH_TOKEN_EXPIRE_DAYS` | Refresh token lifespan | `7` |
-| `ENV` | Environment (dev/prod) | `production` |
-| `LOG_LEVEL` | Logging verbosity | `info` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://user:password@localhost:5432/bookit_db` |
+| `SECRET_KEY` | Secret key used for JWT signing | `your-super-secret-key-change-in-production-12345` |
+| `ALGORITHM` | Algorithm used for token encoding | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT access token expiration time (in minutes) | `30` |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | JWT refresh token expiration time (in days) | `7` |
+| `PROJECT_NAME` | Application name | `BookIt API` |
+| `VERSION` | API version | `1.0.0` |
+| `API_PREFIX` | Base path for all API routes | `/api` |
 
-*(Use `.env` locally and Render Environment Variables in production)*
+*(Use `.env` locally and configure Environment Variables in Render for production deployment.)*
 
----
 
 ## Install dependencies
 
