@@ -7,9 +7,9 @@ It allows users to browse services, make bookings, and leave reviews — while a
 
 ## Live Demo
 
-- **Base URL:** https://book-i6m3zit5i-ngharrys-projects.vercel.app/
-- **Host:** vercel.com
-- **Docs:** https://book-i6m3zit5i-ngharrys-projects.vercel.app/docs
+- **Base URL:** https://book-api-xhzw.onrender.com
+- **Host:** render.com
+- **Docs:** https://book-api-xhzw.onrender.com/docs
  *(Auto-generated via FastAPI Swagger UI)*
 
 ---
@@ -70,7 +70,7 @@ venv\Scripts\activate     # activate env for Windows
 
 ## Environment Variables
 
-| Variable | Description | Example |
+| Variable    |     Description       | Example |
 |-----------|--------------|----------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://user:password@localhost:5432/bookit_db` |
 | `SECRET_KEY` | Secret key used for JWT signing | `your-super-secret-key-change-in-production-12345` |
@@ -80,7 +80,7 @@ venv\Scripts\activate     # activate env for Windows
 | `PROJECT_NAME` | Application name | `BookIt API` |
 | `VERSION` | API version | `1.0.0` |
 | `API_PREFIX` | Base path for all API routes | `/api` |
-
+---
 *(Use `.env` locally and configure Environment Variables in Render for production deployment.)*
 
 
