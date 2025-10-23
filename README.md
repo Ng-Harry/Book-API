@@ -52,7 +52,7 @@ It allows users to browse services, make bookings, and leave reviews — while a
 
 ### Clone the repository
 ```bash
-git https://github.com/Ng-Harry/Book-API.git
+git clone https://github.com/Ng-Harry/BookIt-API
 
 cd bookit-api
 ```
